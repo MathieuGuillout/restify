@@ -1,5 +1,4 @@
 ObjectID        = require('mongodb').ObjectID
-utils           = require './utils'
 mongoose        = require 'mongoose'
 Schema          = mongoose.Schema
 
@@ -32,7 +31,6 @@ module.exports = [
         # OPTIMISE PROBABLY STORE IN TABLES OR ...
         query.populate(val.path) for prop, val of props when val.options.ref?
         query.exec (err, items) ->
-          items = items.map(utils.processItemId)
           done err, items 
   ,
     description : "get one"
@@ -41,7 +39,7 @@ module.exports = [
     do          : (model) ->
       (params, done) ->
         modelOf(model).findOne { _id : new ObjectID(params.id) }, (err, item) ->
-          done err, utils.processItemId(item)
+          done err, item
   ,
     description : "add one" 
     route : "s"
@@ -51,7 +49,7 @@ module.exports = [
         modelName = Object.keys(model)[0]
         instance = new modelOf(model)(params[modelName])
         instance.save (err) ->
-          done err, utils.processItemId(instance)
+          done err, instance
   ,
     description : "update one" 
     route : "s/:id"
