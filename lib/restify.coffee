@@ -10,7 +10,8 @@ restMethods = require './restMethods'
 # TO CALL A METHOD WITH WEB (EXPRESS)
 webMethod = (method) ->
   (req, res) ->
-    params = _.extend(params || {} , req[f]) for f in ["body", "query", "params", "files" ] when req[f]?
+    fields =  ["body", "query", "params", "files" ]
+    params = _.extend(params || {} , req[f]) for f in fields when req[f]?
     method params, (err, result) -> res.send result
 
 
@@ -29,7 +30,7 @@ exports.restify = (options, done) ->
 
   options.models.forEach (model) ->
     restMethods.forEach (method) ->
-      route = "/#{options.apiRoutePrefix}/#{Object.keys(model)[0]}#{method.route}"
+      route = "/#{options.apiRoutePrefix}/#{Object.keys(model)[0]}#{method.route}:format?"
       options.app[method.verb.toLowerCase()](route, webMethod(method.do(model))) 
 
   options.app
