@@ -5,12 +5,23 @@ Schema          = mongoose.Schema
 models = {}
 modelOf = (model) ->
   name = Object.keys(model)[0]
+  indexes = []
   unless models[name]
+    # Add default created and updated properties
     model[name].createdAt = type : Date
     model[name].updatedAt = type : Date
+
+    # Check for specific types (Location, ...)
+    for property, type of model[name]
+      if type == "Location"
+        model[name][property] = { latitude: Number, longitude: Number }
+        index = {}
+        index[property] = "2d"
+        indexes.push index
+
+    # Create schema and indexes
     schema = new Schema(model[name])
-    if model[name].location?
-      schema.index location:"2d"
+    indexes.forEach (index) -> schema.index(index)
 
     schema.pre "save", (next) ->
       @updatedAt = new Date()
