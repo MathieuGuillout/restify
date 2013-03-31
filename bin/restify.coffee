@@ -2,6 +2,7 @@
 
 # Dependencies
 express      = require 'express'
+connect      = require 'connect'
 yaml         = require 'js-yaml'
 fs           = require 'fs'
 mongoose     = require 'mongoose'
@@ -31,7 +32,7 @@ app = express()
 app.configure () ->
   app.use express.static "#{__dirname}/../public"
   app.use express.cookieParser()
-  app.use express.bodyParser()
+  app.use connect.bodyParser()
   app.use app.router
 
 # ERROR HANDLING 

@@ -3,6 +3,8 @@ mongoose        = require 'mongoose'
 Schema          = mongoose.Schema
 
 models = {}
+
+# Give the corresponding mongoose model for a object describing the model
 modelOf = (model) ->
   name = Object.keys(model)[0]
   indexes = []
@@ -14,7 +16,7 @@ modelOf = (model) ->
     # Check for specific types (Location, ...)
     for property, type of model[name]
       if type == "Location"
-        model[name][property] = { latitude: Number, longitude: Number }
+        model[name][property] = { longitude : Number, latitude : Number }
         index = {}
         index[property] = "2d"
         indexes.push index
@@ -32,6 +34,13 @@ modelOf = (model) ->
 
   models[name]
 
+
+# Remove format and ... parameters
+processParams = (params) ->
+  delete params.format
+  params
+
+# _id => id 
 processItemId = (item) ->
   item = item.toObject() if item.toObject
   item.id = item._id
@@ -45,12 +54,12 @@ module.exports = [
     verb        : "get" 
     do          : (model) ->
       (params, done) ->
+        params = processParams(params)
         query = modelOf(model).find(params)
         props = modelOf(model).schema.paths
-        # PREPOULATE LINKED FIELDS
-        # OPTIMISE PROBABLY STORE IN TABLES OR ...
         query.populate(val.path) for prop, val of props when val.options.ref?
         query.exec (err, items) ->
+          console.log(err) if err?
           done err, items.map(processItemId)
   ,
     description : "get one"
@@ -67,6 +76,8 @@ module.exports = [
     do : (model) ->
       (params, done) ->
         modelName = Object.keys(model)[0]
+        
+        params[modelName] = processParams(params[modelName])
         if params[modelName].id 
           idToUpdate = new ObjectID(params[modelName].id)
           toUpdate =  params[modelName]
