@@ -37,7 +37,7 @@ modelOf = (model) ->
 
 # Remove format and ... parameters
 processParams = (params) ->
-  delete params.format
+  delete(params.format) if params?
   params
 
 # _id => id 
@@ -55,6 +55,7 @@ module.exports = [
     do          : (model) ->
       (params, done) ->
         params = processParams(params)
+        console.log params
         query = modelOf(model).find(params)
         props = modelOf(model).schema.paths
         query.populate(val.path) for prop, val of props when val.options.ref?
@@ -76,20 +77,22 @@ module.exports = [
     do : (model) ->
       (params, done) ->
         modelName = Object.keys(model)[0]
-        
-        params[modelName] = processParams(params[modelName])
-        if params[modelName].id 
-          idToUpdate = new ObjectID(params[modelName].id)
-          toUpdate =  params[modelName]
-          delete toUpdate.id
-          modelOf(model).update { _id :  idToUpdate }, { $set : toUpdate }, (err) ->
-            params[modelName].id = idToUpdate
-            done err, params[modelName]
+        if not params? or not params[modelName]?
+          done null, null
         else
-          instance = new modelOf(model)(params[modelName])
-          instance.save (err) ->
-            console.log(err) if err?
-            done err, processItemId(instance)
+          params[modelName] = processParams(params[modelName])
+          if params[modelName].id 
+            idToUpdate = new ObjectID(params[modelName].id)
+            toUpdate =  params[modelName]
+            delete toUpdate.id
+            modelOf(model).update { _id :  idToUpdate }, { $set : toUpdate }, (err) ->
+              params[modelName].id = idToUpdate
+              done err, params[modelName]
+          else
+            instance = new modelOf(model)(params[modelName])
+            instance.save (err) ->
+              console.log(err) if err?
+              done err, processItemId(instance)
 
 
   ,
