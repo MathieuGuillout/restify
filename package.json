@@ -7,7 +7,7 @@
   "author": "MathieuGuillout",
   "license": "BSD",
   "bin": {
-    "restify": "bin/restify.coffee"
+    "restify": "bin/restify.litcoffee"
   },
   "dependencies": {
     "mongodb": "~1.2.13",
@@ -17,6 +17,7 @@
     "config": "~0.4.21",
     "mongoose": "~3.5.9",
     "commander": "~1.1.1",
-    "connect": "~2.7.3"
+    "connect": "~2.7.3",
+    "barefoot": "0.0.12"
   }
 }

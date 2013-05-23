@@ -1,0 +1,26 @@
+server:
+  db: "mongodb://localhost/scrambled"
+  port: 5001
+
+web_server:
+  port: 5002
+
+
+# Scrambled server
+# We need users (with login, fb login)
+# We need words 
+# We need list of words
+# We need leaderboards
+
+models:
+  - player2:
+      username: String
+      test: String
+  - game2:
+      title: String
+  - user:
+      username: String
+      location: Location
+  - game:
+      title: String
+      location: Location
