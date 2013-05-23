@@ -18,28 +18,35 @@ Give the corresponding mongoose model for a object describing the model
       name = Object.keys(model)[0]
       indexes = []
       unless models[name]
-        # Add default created and updated properties
-        model[name].createdAt = type : Date
-        model[name].updatedAt = type : Date
+        
+        if name == "model"
 
-        # Check for specific types (Location, ...)
-        for property, type of model[name]
-          if type == "Location"
-            model[name][property] = { longitude : Number, latitude : Number }
-            index = {}
-            index[property] = "2d"
-            indexes.push index
+          models[name] = model[name]
 
-        # Create schema and indexes
-        schema = new Schema(model[name])
-        indexes.forEach (index) -> schema.index(index)
+        else
 
-        schema.pre "save", (next) ->
-          @updatedAt = new Date()
-          @createdAt ?= new Date()
-          next()
+          # Add default created and updated properties
+          model[name].createdAt = type : Date
+          model[name].updatedAt = type : Date
 
-        models[name] = mongoose.model(name, schema)
+          # Check for specific types (Location, ...)
+          for property, type of model[name]
+            if type == "Location"
+              model[name][property] = { longitude : Number, latitude : Number }
+              index = {}
+              index[property] = "2d"
+              indexes.push index
+
+          # Create schema and indexes
+          schema = new Schema(model[name])
+          indexes.forEach (index) -> schema.index(index)
+
+          schema.pre "save", (next) ->
+            @updatedAt = new Date()
+            @createdAt ?= new Date()
+            next()
+
+          models[name] = mongoose.model(name, schema)
 
       models[name]
 
@@ -69,7 +76,6 @@ _id => id
         do          : (model) ->
           (params, done) ->
             params = processParams(params)
-            console.log params
             query = modelOf(model).find(params)
             props = modelOf(model).schema.paths
             query.populate(val.path) for prop, val of props when val.options.ref?
@@ -129,4 +135,11 @@ _id => id
             idToRemove = new ObjectID(params.id)
             modelOf(model).remove { _id :  idToRemove }
             done null, params
+      ,
+        description : "get the schema of the model" 
+        route : "/schema"
+        verb : "get" 
+        do : (model) ->
+          (params, done) ->
+            done null, modelOf(model)
       ]

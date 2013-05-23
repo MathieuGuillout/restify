@@ -4,6 +4,7 @@ server:
 
 web_server:
   port: 5002
+  api_server: "http://localhost:5001"
 
 
 # Scrambled server
@@ -12,15 +13,15 @@ web_server:
 # We need list of words
 # We need leaderboards
 
-models:
-  - player2:
-      username: String
-      test: String
-  - game2:
-      title: String
-  - user:
-      username: String
-      location: Location
-  - game:
-      title: String
-      location: Location
+model:
+  player2:
+    username: String
+    test: String
+  game2:
+    title: String
+  user:
+    username: String
+    location: Location
+  game:
+    title: String
+    location: Location

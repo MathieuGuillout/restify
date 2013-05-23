@@ -18,6 +18,7 @@
     "mongoose": "~3.5.9",
     "commander": "~1.1.1",
     "connect": "~2.7.3",
-    "barefoot": "0.0.12"
+    "barefoot": "0.0.12",
+    "restapi": "0.0.6"
   }
 }

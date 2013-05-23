@@ -10,8 +10,10 @@ module dependencies
     bf       = require 'barefoot'
 
 
+
 the rest methods to be defined
 ------------------------------
+
 
     restMethods = require './restMethods'
 
@@ -20,23 +22,35 @@ the rest methods to be defined
 Main method to apply route on a express server
 ---------------------------------------------
 
+    applyRestMethodsToModel = (app, route, name, model) ->
+      restMethods.forEach (method) ->
+        url = route + "#{name}#{method.route}:format?"
+
+        verb = method.verb.toLowerCase()
+        paramsMethod = {}
+        paramsMethod[name] = model
+        webMethod = bf.webService( method.do( paramsMethod ) )
+        app[verb] url, webMethod
+
+
     exports.restify = (options, done) ->
 
-      # THE MODELS TO CREATE
-      options.models ?= []
+      # The models to create
+      options.model ?= []
 
-      # THE WEB SERVER (EXPRESS) TO ADD ROUTES TO
+      # The web server to add routes to
       options.app 
       
-      # API ROUTE PREFIX
+      # Api route prefix
       options.apiRoutePrefix ?= "api"
 
-
-      options.models.forEach (model) ->
-        restMethods.forEach (method) ->
-          route = "/#{options.apiRoutePrefix}/" 
-          route += "#{Object.keys(model)[0]}#{method.route}:format?"
-
-          options.app[method.verb.toLowerCase()](route, bf.webService(method.do(model))) 
+      route = "/#{options.apiRoutePrefix}/" 
+      
+      # Define a route for every model && every method
+      Object.keys(options.model).forEach (model) ->
+        applyRestMethodsToModel options.app, route, model, options.model[model]
+  
+      # Create routes & methods for the model's model
+      applyRestMethodsToModel options.app, route, "model", options.model
 
       options.app

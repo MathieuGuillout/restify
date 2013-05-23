@@ -13,6 +13,7 @@ Dependencies
 Our Library 
 
     restify      = require './../lib/restify'
+    web_server   = require './../web_server/index'
 
 
 Command line options
